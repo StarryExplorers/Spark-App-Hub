@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>✨ Spark's App Hub</title>
   <meta name="theme-color" content="#fffbe6">
+  <link rel="manifest" href="manifest.json" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -12,38 +13,45 @@
       color: #333;
       padding: 30px;
       text-align: center;
+      transition: background-color 0.3s, color 0.3s;
     }
-
     h1 {
       color: #e07a5f;
       font-size: 2.5em;
     }
-
-    p {
-      font-size: 1.1em;
+    .theme-switcher {
+      margin-bottom: 20px;
     }
-
+    .theme-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
     .app {
       background: #fff;
       border: 2px solid #f4d35e;
       border-radius: 10px;
-      margin: 20px auto;
-      max-width: 400px;
       padding: 20px;
       box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
+      position: relative;
     }
-
     .app h2 {
       margin-bottom: 10px;
       font-size: 1.5em;
       color: #457b9d;
     }
-
     .app p {
       font-size: 1em;
       margin-bottom: 15px;
     }
-
     .app a {
       display: inline-block;
       padding: 10px 20px;
@@ -53,11 +61,18 @@
       border-radius: 6px;
       transition: 0.3s ease;
     }
-
     .app a:hover {
       background-color: #e76f51;
     }
-
+    .badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ffcb77;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.8em;
+    }
     footer {
       margin-top: 40px;
       color: #aaa;
@@ -69,30 +84,69 @@
   <h1>✨ Spark's App Hub</h1>
   <p>Welcome to my collection of fun & useful mini web apps!</p>
 
-  <div class="app">
-    <h2>🔤 Numlin Translator</h2>
-    <p>Turn English into a secret number code and decode it too!</p>
-    <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Try it Now</a>
+  <div class="theme-switcher">
+    <button class="theme-btn" onclick="setTheme('light')">☀️ Light</button>
+    <button class="theme-btn" onclick="setTheme('dark')">🌙 Dark</button>
+    <button class="theme-btn" onclick="setTheme('pinkblue')">💖 Blue/Pink</button>
   </div>
 
-  <div class="app">
-    <h2>🌡️ Temperature Converter</h2>
-    <p>Convert °C, °F and K easily with this simple tool.</p>
-    <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Try it Now</a>
-  </div>
+  <input type="text" id="search" placeholder="🔍 Search for an app..." oninput="filterApps()" style="padding:10px;width:90%;max-width:400px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc">
 
-  <div class="app">
-    <h2>🧮 Talking Calculator</h2>
-    <p>A fun and colourful talking calculator that speaks answers aloud or types them out for you!</p>
-    <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Try it Now</a>
-  </div>
+  <div class="apps" id="apps">
+    <div class="app">
+      <h2>🔤 Numlin Translator</h2>
+      <p>Turn English into a secret number code and decode it too!</p>
+      <span class="badge">Featured</span>
+      <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Try it Now</a>
+    </div>
 
-  <div class="app">
-    <h2>RePix</h2>
-    <p>A useful app that resizes images for you!</p>
-    <a href="https://starryexplorers.github.io/RePix/" target="_blank">Try it Now</a>
+    <div class="app">
+      <h2>🌡️ Temperature Converter</h2>
+      <p>Convert °C, °F and K easily with this simple tool.</p>
+      <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Try it Now</a>
+    </div>
+
+    <div class="app">
+      <h2>🧮 Talking Calculator</h2>
+      <p>A fun calculator that speaks your answers out loud!</p>
+      <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Try it Now</a>
+    </div>
+
+    <div class="app">
+      <h2>🖼️ RePix</h2>
+      <p>Resize your images quickly and easily – no downloads needed!</p>
+      <a href="https://starryexplorers.github.io/RePix/" target="_blank">Try it Now</a>
+    </div>
   </div>
 
   <footer>Built with ❤️ by Spark</footer>
+
+  <script>
+    const apps = document.querySelectorAll(".app");
+    function filterApps() {
+      const value = document.getElementById("search").value.toLowerCase();
+      apps.forEach(app => {
+        app.style.display = app.textContent.toLowerCase().includes(value) ? "block" : "none";
+      });
+    }
+
+    function setTheme(mode) {
+      if (mode === 'dark') {
+        document.body.style.backgroundColor = '#1e1e1e';
+        document.body.style.color = '#f1f1f1';
+      } else if (mode === 'pinkblue') {
+        document.body.style.backgroundColor = '#dceefb';
+        document.body.style.color = '#333';
+      } else {
+        document.body.style.backgroundColor = '#fffbe6';
+        document.body.style.color = '#333';
+      }
+    }
+
+    // PWA Install Prompt (basic)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
