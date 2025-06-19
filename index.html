@@ -6,6 +6,14 @@
   <title>✨ Spark's App Hub</title>
   <meta name="theme-color" content="#fffbe6">
   <link rel="manifest" href="manifest.json" />
+
+  <!-- 🔐 Login check -->
+  <script>
+    if (!localStorage.getItem("loggedInUser")) {
+      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
+    }
+  </script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
