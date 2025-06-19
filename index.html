@@ -1,36 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>✨ Spark's App Hub</title>
-  <meta name="theme-color" content="#fffbe6">
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Service Worker for Spark's App Hub -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => {
-          reg.onupdatefound = () => {
-            const newWorker = reg.installing;
-            newWorker.onstatechange = () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                if (confirm("🔄 A new version is available. Do you want to update?")) {
-                  newWorker.postMessage({ action: 'SKIP_WAITING' });
-                  window.location.reload();
-                }
-              }
-            };
-          };
-        });
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log("🔥 Controller changed — app updated");
-      });
+        .then(() => console.log("✅ SparkLogin service worker registered"))
+        .catch(err => console.error("❌ Service Worker error", err));
     }
   </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>✨ Spark's App Hub</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#fffbe6">
+  <link rel="manifest" href="manifest.json" />
 
-  <!-- Login Redirect -->
+  <!-- 🔐 Login check -->
   <script>
     if (!localStorage.getItem("loggedInUser")) {
       window.location.href = "https://starryexplorers.github.io/SparkLogin/";
@@ -44,6 +29,7 @@
       color: #333;
       padding: 30px;
       text-align: center;
+      transition: background-color 0.3s, color 0.3s;
     }
     h1 {
       color: #e07a5f;
@@ -82,19 +68,16 @@
       font-size: 1em;
       margin-bottom: 15px;
     }
-    .app a, .app button.install-btn {
+    .app a {
       display: inline-block;
-      padding: 10px 16px;
-      margin: 5px;
+      padding: 10px 20px;
       background-color: #f4a261;
       color: white;
       text-decoration: none;
-      border: none;
       border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
+      transition: 0.3s ease;
     }
-    .app a:hover, .app button.install-btn:hover {
+    .app a:hover {
       background-color: #e76f51;
     }
     .badge {
@@ -110,6 +93,21 @@
       margin-top: 40px;
       color: #aaa;
       font-size: 0.9em;
+    }
+
+    #installBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #29a19c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+    #installBtn:hover {
+      background-color: #228a86;
     }
   </style>
 </head>
@@ -131,30 +129,29 @@
       <p>Turn English into a secret number code and decode it too!</p>
       <span class="badge">Featured</span>
       <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Try it Now</a>
-      <button class="install-btn" onclick="installApp('Numlin Translator')">⬇️ Install</button>
     </div>
 
     <div class="app">
       <h2>🌡️ Temperature Converter</h2>
       <p>Convert °C, °F and K easily with this simple tool.</p>
       <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Try it Now</a>
-      <button class="install-btn" onclick="installApp('Temperature Converter')">⬇️ Install</button>
     </div>
 
     <div class="app">
       <h2>🧮 Talking Calculator</h2>
       <p>A fun calculator that speaks your answers out loud!</p>
       <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Try it Now</a>
-      <button class="install-btn" onclick="installApp('Talking Calculator')">⬇️ Install</button>
     </div>
 
     <div class="app">
       <h2>🖼️ RePix</h2>
       <p>Resize your images quickly and easily – no downloads needed!</p>
       <a href="https://starryexplorers.github.io/RePix/" target="_blank">Try it Now</a>
-      <button class="install-btn" onclick="installApp('RePix')">⬇️ Install</button>
     </div>
   </div>
+
+  <!-- 👇 Install button -->
+  <button id="installBtn" onclick="triggerInstallPrompt()">⬇️ Install This App</button>
 
   <footer>Built with ❤️ by Spark</footer>
 
@@ -180,29 +177,52 @@
       }
     }
 
-    let deferredPrompt = null;
+    // Service worker update check with user prompt
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newWorker = reg.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                const update = confirm("🔄 A new version is available. Do you want to update?");
+                if (update) {
+                  newWorker.postMessage({ action: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
+              }
+            }
+          };
+        };
+      });
 
-    window.addEventListener('beforeinstallprompt', (e) => {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log("🔥 Controller changed — app updated");
+      });
+    }
+
+    // 🪄 Install Prompt logic
+    let deferredPrompt;
+
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      // Show install buttons if needed later
+      document.getElementById("installBtn").style.display = "inline-block";
     });
 
-    function installApp(appName) {
+    function triggerInstallPrompt() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choice => {
-          if (choice.outcome === 'accepted') {
-            console.log(`✅ ${appName} installed`);
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === "accepted") {
+            console.log("✅ App installed!");
           } else {
-            console.log(`❌ ${appName} install dismissed`);
+            console.log("❌ Install dismissed.");
           }
           deferredPrompt = null;
         });
-      } else {
-        alert("ℹ️ Please use your browser's install option (⋮ > Install App)");
       }
     }
   </script>
 </body>
-      </html>
+    </html>
