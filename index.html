@@ -1,27 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("✅ SparkLogin service worker registered"))
-      .catch(err => console.error("❌ Service Worker error", err));
-  }
-  </script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>✨ Spark's App Hub</title>
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#fffbe6">
   <link rel="manifest" href="manifest.json" />
-
-  <!-- 🔐 Login check -->
-  <script>
-    if (!localStorage.getItem("loggedInUser")) {
-      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
-    }
-  </script>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -68,7 +52,8 @@
       font-size: 1em;
       margin-bottom: 15px;
     }
-    .app a {
+    .app a,
+    .app button.download {
       display: inline-block;
       padding: 10px 20px;
       background-color: #f4a261;
@@ -76,8 +61,10 @@
       text-decoration: none;
       border-radius: 6px;
       transition: 0.3s ease;
+      margin: 5px;
     }
-    .app a:hover {
+    .app a:hover,
+    .app button.download:hover {
       background-color: #e76f51;
     }
     .badge {
@@ -94,11 +81,15 @@
       color: #aaa;
       font-size: 0.9em;
     }
+    .category {
+      margin-top: 50px;
+    }
   </style>
 </head>
 <body>
   <h1>✨ Spark's App Hub</h1>
   <p>Welcome to my collection of fun & useful mini web apps!</p>
+  <p><button onclick="logout()" style="background:#ff5252;color:white;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;">🚪 Logout</button></p>
 
   <div class="theme-switcher">
     <button class="theme-btn" onclick="setTheme('light')">☀️ Light</button>
@@ -114,24 +105,28 @@
       <p>Turn English into a secret number code and decode it too!</p>
       <span class="badge">Featured</span>
       <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Try it Now</a>
+      <button class="download" onclick="downloadApp('Numlin_Translator')">💾 Download</button>
     </div>
 
     <div class="app">
       <h2>🌡️ Temperature Converter</h2>
       <p>Convert °C, °F and K easily with this simple tool.</p>
       <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Try it Now</a>
+      <button class="download" onclick="downloadApp('Temperature-Converter')">💾 Download</button>
     </div>
 
     <div class="app">
-      <h2>🧮 Talking Calculator</h2>
+      <h2>🧱 Talking Calculator</h2>
       <p>A fun calculator that speaks your answers out loud!</p>
       <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Try it Now</a>
+      <button class="download" onclick="downloadApp('Talking-Calculator')">💾 Download</button>
     </div>
 
     <div class="app">
       <h2>🖼️ RePix</h2>
       <p>Resize your images quickly and easily – no downloads needed!</p>
       <a href="https://starryexplorers.github.io/RePix/" target="_blank">Try it Now</a>
+      <button class="download" onclick="downloadApp('RePix')">💾 Download</button>
     </div>
   </div>
 
@@ -159,36 +154,37 @@
       }
     }
 
-    // PWA Install Prompt (basic)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      location.href = "https://starryexplorers.github.io/SparkLogin/";
     }
-  </script>
 
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newWorker = reg.installing;
-        newWorker.onstatechange = () => {
-          if (newWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller) {
-              const update = confirm("🔄 A new version is available. Do you want to update?");
-              if (update) {
-                newWorker.postMessage({ action: 'SKIP_WAITING' });
-                window.location.reload();
+    function downloadApp(appFolder) {
+      window.location.href = `https://starryexplorers.github.io/${appFolder}/index.html`;
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newWorker = reg.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                const update = confirm("🔄 A new version is available. Do you want to update?");
+                if (update) {
+                  newWorker.postMessage({ action: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
               }
             }
-          }
+          };
         };
-      };
-    });
+      });
 
-    // Listen to the message to skip waiting
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log("🔥 Controller changed — app updated");
-    });
-  }
-</script>
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log("🔥 Controller changed — app updated");
+      });
+    }
+  </script>
 </body>
 </html>
