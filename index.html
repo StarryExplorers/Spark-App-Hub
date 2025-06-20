@@ -4,16 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>✨ Spark's App Hub</title>
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#fffbe6">
-
-  <!-- 🔐 Login check -->
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newWorker = reg.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                const update = confirm("🔄 A new version is available. Do you want to update?");
+                if (update) {
+                  newWorker.postMessage({ action: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
+              }
+            }
+          };
+        };
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log("🔥 Controller changed — app updated");
+      });
+    }
+  </script>
   <script>
     if (!localStorage.getItem("loggedInUser")) {
       window.location.href = "https://starryexplorers.github.io/SparkLogin/";
     }
   </script>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -22,18 +42,7 @@
       padding: 30px;
       text-align: center;
     }
-    h1 {
-      color: #e07a5f;
-      font-size: 2.5em;
-    }
-    .theme-switcher {
-      margin-bottom: 20px;
-    }
-    .theme-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      margin: 0 5px;
+    .theme-btn, button {
       cursor: pointer;
     }
     .apps {
@@ -47,165 +56,103 @@
       border: 2px solid #f4d35e;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
       position: relative;
     }
-    .app h2 {
-      margin-bottom: 10px;
-      font-size: 1.5em;
-      color: #457b9d;
-    }
-    .app p {
-      font-size: 1em;
-      margin-bottom: 15px;
-    }
-    .app a {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #f4a261;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-    .app a:hover {
-      background-color: #e76f51;
-    }
-    .badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #ffcb77;
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 0.8em;
-    }
-    .logout-btn, #installBtn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #29a19c;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .logout-btn:hover, #installBtn:hover {
-      background-color: #228a86;
-    }
-    .star {
-      cursor: pointer;
-      color: gold;
-      font-size: 1.2em;
-    }
-    textarea.comment-box {
-      width: 100%;
-      max-width: 300px;
+    .comment-box, .rating-box {
       margin-top: 10px;
-      padding: 10px;
-      border-radius: 6px;
+      text-align: left;
     }
-    footer {
-      margin-top: 40px;
-      color: #aaa;
-      font-size: 0.9em;
+    .install-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      background: #00bfa5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <h1>✨ Spark's App Hub</h1>
   <p>Welcome to my collection of fun & useful mini web apps!</p>
-
-  <div class="theme-switcher">
-    <button class="theme-btn" onclick="setTheme('light')">☀️ Light</button>
-    <button class="theme-btn" onclick="setTheme('dark')">🌙 Dark</button>
-    <button class="theme-btn" onclick="setTheme('pinkblue')">💖 Blue/Pink</button>
-  </div>
-
-  <button class="logout-btn" onclick="logout()">🚪 Log Out</button>
-  <button id="installBtn" style="display:none">⬇️ Install App</button>
-
-  <input type="text" id="search" placeholder="🔍 Search for an app..." oninput="filterApps()" style="padding:10px;width:90%;max-width:400px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc">
+  <button onclick="logout()">🔓 Log Out</button>
 
   <div class="apps" id="apps">
-    <div class="app" data-name="Numlin Translator">
-      <h2>🔤 Numlin Translator <span class="star" onclick="toggleStar(this)">☆</span></h2>
+    <div class="app">
+      <h2>🔤 Numlin Translator</h2>
       <p>Turn English into a secret number code and decode it too!</p>
-      <span class="badge">Featured</span>
-      <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Try it Now</a>
-      <textarea class="comment-box" placeholder="💬 Leave a comment..."></textarea>
+      <a href="https://starryexplorers.github.io/Numlin_Translator/" target="_blank">Open</a>
+      <a href="Numlin_Translator.zip" download>⬇️ Download</a>
+      <div class="comment-box">
+        <textarea rows="2" placeholder="Leave a comment..."></textarea>
+        <button onclick="saveComment(this)">Post</button>
+        <div class="comments"></div>
+      </div>
+      <div class="rating-box">
+        ⭐ Rate: <span class="stars">★ ★ ★ ★ ★</span>
+      </div>
     </div>
-    <div class="app" data-name="Temperature Converter">
-      <h2>🌡️ Temperature Converter <span class="star" onclick="toggleStar(this)">☆</span></h2>
+
+    <div class="app">
+      <h2>🌡️ Temperature Converter</h2>
       <p>Convert °C, °F and K easily with this simple tool.</p>
-      <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Try it Now</a>
-      <textarea class="comment-box" placeholder="💬 Leave a comment..."></textarea>
+      <a href="https://starryexplorers.github.io/Temperature-Converter/" target="_blank">Open</a>
+      <a href="Temperature-Converter.zip" download>⬇️ Download</a>
     </div>
-    <div class="app" data-name="Talking Calculator">
-      <h2>🧮 Talking Calculator <span class="star" onclick="toggleStar(this)">☆</span></h2>
+
+    <div class="app">
+      <h2>🧮 Talking Calculator</h2>
       <p>A fun calculator that speaks your answers out loud!</p>
-      <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Try it Now</a>
-      <textarea class="comment-box" placeholder="💬 Leave a comment..."></textarea>
+      <a href="https://starryexplorers.github.io/Talking-Calculator/" target="_blank">Open</a>
+      <a href="Talking-Calculator.zip" download>⬇️ Download</a>
     </div>
-    <div class="app" data-name="RePix">
-      <h2>🖼️ RePix <span class="star" onclick="toggleStar(this)">☆</span></h2>
+
+    <div class="app">
+      <h2>🖼️ RePix</h2>
       <p>Resize your images quickly and easily – no downloads needed!</p>
-      <a href="https://starryexplorers.github.io/RePix/" target="_blank">Try it Now</a>
-      <textarea class="comment-box" placeholder="💬 Leave a comment..."></textarea>
+      <a href="https://starryexplorers.github.io/RePix/" target="_blank">Open</a>
+      <a href="RePix.zip" download>⬇️ Download</a>
     </div>
   </div>
 
-  <footer>Built with ❤️ by Spark</footer>
+  <button class="install-btn" id="installBtn">📲 Install App Hub</button>
 
   <script>
-    const apps = document.querySelectorAll(".app");
-
-    function filterApps() {
-      const value = document.getElementById("search").value.toLowerCase();
-      apps.forEach(app => {
-        app.style.display = app.dataset.name.toLowerCase().includes(value) ? "block" : "none";
-      });
-    }
-
-    function toggleStar(el) {
-      el.textContent = el.textContent === '☆' ? '★' : '☆';
-    }
-
-    function logout() {
-      localStorage.removeItem("loggedInUser");
-      location.reload();
-    }
-
-    function setTheme(mode) {
-      if (mode === 'dark') {
-        document.body.style.backgroundColor = '#1e1e1e';
-        document.body.style.color = '#f1f1f1';
-      } else if (mode === 'pinkblue') {
-        document.body.style.backgroundColor = '#dceefb';
-        document.body.style.color = '#333';
-      } else {
-        document.body.style.backgroundColor = '#fffbe6';
-        document.body.style.color = '#333';
-      }
-    }
-
-    // Install prompt
     let deferredPrompt;
-    window.addEventListener("beforeinstallprompt", (e) => {
+    window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      document.getElementById("installBtn").style.display = "inline-block";
+      document.getElementById('installBtn').style.display = 'inline-block';
     });
-    document.getElementById("installBtn").addEventListener("click", () => {
+
+    document.getElementById('installBtn').addEventListener('click', () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(choice => {
-          if (choice.outcome === "accepted") {
-            console.log("✅ App installed");
+          if (choice.outcome === 'accepted') {
+            console.log('App installed!');
           }
           deferredPrompt = null;
         });
       }
     });
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
+    }
+
+    function saveComment(btn) {
+      const box = btn.parentElement;
+      const input = box.querySelector('textarea');
+      const div = document.createElement('div');
+      div.innerText = input.value;
+      box.querySelector('.comments').appendChild(div);
+      input.value = '';
+    }
   </script>
 </body>
-  </html>
+</html>
