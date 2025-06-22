@@ -2,17 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>✨ Spark's App Hub</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#fffbe6">
-
-  <!-- 🔐 Login check -->
-  <script>
-    if (!localStorage.getItem("loggedInUser")) {
-      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
-    }
-  </script>
 
   <style>
     body {
@@ -109,8 +102,6 @@
       color: #aaa;
       font-size: 0.9em;
     }
-
-    /* 🔵 Floating App Club bubble */
     .app-club-bubble {
       position: fixed;
       top: 20px;
@@ -132,6 +123,12 @@
       transform: scale(1.1);
     }
   </style>
+
+  <script>
+    if (!localStorage.getItem("loggedInUser")) {
+      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
+    }
+  </script>
 </head>
 <body>
   <h1>✨ Spark's App Hub</h1>
@@ -174,61 +171,62 @@
 
   <footer>Built with ❤️ by Spark</footer>
 
-  <!-- 🟣 App Club bubble -->
   <div class="app-club-bubble" onclick="window.open('https://starryexplorers.github.io/App-Club/', '_blank')">
     💬
   </div>
 
   <script>
-    const apps = document.querySelectorAll(".app");
+    document.addEventListener('DOMContentLoaded', () => {
+      const apps = document.querySelectorAll(".app");
 
-    function filterApps() {
-      const value = document.getElementById("search").value.toLowerCase();
-      apps.forEach(app => {
-        app.style.display = app.dataset.name.toLowerCase().includes(value) ? "block" : "none";
-      });
-    }
-
-    function toggleStar(el) {
-      el.textContent = el.textContent === '☆' ? '★' : '☆';
-    }
-
-    function logout() {
-      localStorage.removeItem("loggedInUser");
-      location.reload();
-    }
-
-    function setTheme(mode) {
-      if (mode === 'dark') {
-        document.body.style.backgroundColor = '#1e1e1e';
-        document.body.style.color = '#f1f1f1';
-      } else if (mode === 'pinkblue') {
-        document.body.style.backgroundColor = '#dceefb';
-        document.body.style.color = '#333';
-      } else {
-        document.body.style.backgroundColor = '#fffbe6';
-        document.body.style.color = '#333';
-      }
-    }
-
-    // Install prompt
-    let deferredPrompt;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById("installBtn").style.display = "inline-block";
-    });
-    document.getElementById("installBtn").addEventListener("click", () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choice => {
-          if (choice.outcome === "accepted") {
-            console.log("✅ App installed");
-          }
-          deferredPrompt = null;
+      window.filterApps = function () {
+        const value = document.getElementById("search").value.toLowerCase();
+        apps.forEach(app => {
+          app.style.display = app.dataset.name.toLowerCase().includes(value) ? "block" : "none";
         });
       }
+
+      window.toggleStar = function (el) {
+        el.textContent = el.textContent === '☆' ? '★' : '☆';
+      }
+
+      window.logout = function () {
+        localStorage.removeItem("loggedInUser");
+        location.reload();
+      }
+
+      window.setTheme = function (mode) {
+        if (mode === 'dark') {
+          document.body.style.backgroundColor = '#1e1e1e';
+          document.body.style.color = '#f1f1f1';
+        } else if (mode === 'pinkblue') {
+          document.body.style.backgroundColor = '#dceefb';
+          document.body.style.color = '#333';
+        } else {
+          document.body.style.backgroundColor = '#fffbe6';
+          document.body.style.color = '#333';
+        }
+      }
+
+      let deferredPrompt;
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById("installBtn").style.display = "inline-block";
+      });
+
+      document.getElementById("installBtn").addEventListener("click", () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(choice => {
+            if (choice.outcome === "accepted") {
+              console.log("✅ App installed");
+            }
+            deferredPrompt = null;
+          });
+        }
+      });
     });
   </script>
 </body>
-                                                                                </html>
+</html>
