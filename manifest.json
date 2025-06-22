@@ -1,11 +1,13 @@
 {
-  "name": "Spark-App-Hub",
+  "name": "✨ Spark-App-Hub",
   "short_name": "AppHub",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#fffbe6",
   "theme_color": "#ff6f00",
   "orientation": "portrait",
+  "description": "A fun hub by Spark for exploring cool mini web apps!",
+  "id": "/",
   "icons": [
     {
       "src": "icon-192.png",
