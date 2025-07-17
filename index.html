@@ -72,23 +72,10 @@
       border-radius: 8px;
       font-size: 0.8em;
     }
-    .logout-btn, #installBtn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #29a19c;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .logout-btn:hover, #installBtn:hover {
-      background-color: #228a86;
-    }
     .star {
       cursor: pointer;
       color: gold;
-      font-size: 1.2em;
+      font-size: 1.2em
     }
     textarea.comment-box {
       width: 100%;
@@ -124,11 +111,6 @@
     }
   </style>
 
-  <script>
-    if (!localStorage.getItem("loggedInUser")) {
-      window.location.href = "https://starryexplorers.github.io/SparkLogin/";
-    }
-  </script>
 </head>
 <body>
   <h1>✨ Spark's App Hub</h1>
@@ -140,7 +122,6 @@
     <button class="theme-btn" onclick="setTheme('pinkblue')">💖 Blue/Pink</button>
   </div>
 
-  <button class="logout-btn" onclick="logout()">🚪 Log Out</button>
   <button id="installBtn" style="display:none">⬇️ Install App</button>
 
   <input type="text" id="search" placeholder="🔍 Search for an app..." oninput="filterApps()" style="padding:10px;width:90%;max-width:400px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc">
@@ -254,11 +235,6 @@
 
       window.toggleStar = function (el) {
         el.textContent = el.textContent === '☆' ? '★' : '☆';
-      }
-
-      window.logout = function () {
-        localStorage.removeItem("loggedInUser");
-        location.reload();
       }
 
       window.setTheme = function (mode) {
